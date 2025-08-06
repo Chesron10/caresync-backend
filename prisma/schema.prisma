@@ -1,0 +1,185 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum gender {
+  Male
+  Female
+}
+
+enum maritalSatus {
+  Married
+  Single
+  Divorced
+}
+
+enum doctorStatus {
+  Available
+  Unavailable
+}
+
+enum severity {
+  Mild
+  Moderate
+  Severe
+}
+
+enum healthTipCategory {
+  Diet
+  Exercise
+  Mental
+}
+
+model Users {
+  id String @id @default(uuid())
+  firstName String
+  lastName String
+  email String @unique
+  password String
+  phoneNumber String
+  dob DateTime
+  gender gender
+  cityOrTown String?
+  district String?
+  street String?
+  maritalSatus maritalSatus? @default(Single)
+  nationality String?
+  occupation String?
+  profileImg String?
+  createdAt DateTime @default(now())
+  profile Profiles[]
+  reports Reports[]
+  tests Tests[]
+}
+
+ 
+model Doctors {
+  id String @id @default(uuid())
+  firstName String
+  lastName String
+  email String @unique
+  password String
+  phoneNumber String
+  specialisation String
+  hospitalAffiliation String
+  gender gender
+  profileImg String?
+  status doctorStatus @default(Available)
+  healthTips HealthTips[]
+  createdAt DateTime @default(now())
+}
+
+
+model Profiles {
+  id String @id @default(uuid())
+  userId String
+  height String?
+  weight String?
+  BMI String?
+  bloodPressure String?
+  glucoseLevel String?
+  age Int?
+  bloodGroup String?
+  inheritedDiseases String?
+  allergies Allergies[]
+  createdAt DateTime @default(now())
+  user Users @relation(fields: [userId], references: [id])
+}
+
+
+model Allergies {
+  id String @id @default(uuid())
+  userId String
+  name String
+  severity severity @default(Mild)
+  createdAt DateTime @default(now())
+  reaction String
+  profile Profiles @relation(fields: [userId], references: [id])
+}
+
+
+model Reports {
+  id String @id @default(uuid())
+  userId String
+  symptoms String[]
+  descriptions String[]
+  doctorId String
+  userFeedback String?
+  status severity @default(Mild)
+  tests Tests[]
+  prescriptions Prescriptions[]
+  createdAt DateTime @default(now())
+  user Users @relation(fields: [userId], references: [id])
+}
+
+
+model Tests {
+  id String @id @default(uuid())
+  reportId String
+  userId String
+  name String
+  description String
+  dateConducted DateTime @default(now())
+  files String[]
+  result String?
+  conductedBy String
+  createdAt DateTime @default(now())
+  report Reports @relation(fields: [reportId], references: [id])
+  user Users @relation(fields: [userId], references: [id])
+}
+
+
+model Prescriptions {
+  id String @id @default(uuid())
+  reportId String
+  medicineName String
+  dosage String
+  quantity Int?
+  duration String
+  instructions String
+  issueDate DateTime @default(now())
+  createdAt DateTime @default(now())
+  report Reports @relation(fields: [reportId], references: [id])
+}
+
+
+model HealthTips {
+  id String @id @default(uuid())
+  doctorId String
+  category healthTipCategory?
+  title String
+  description String
+  targetDemography String
+  createdAt DateTime @default(now())
+  doctor Doctors @relation(fields: [doctorId], references: [id])
+}
+
+
+model OneTimeCode {
+  id String @id @default(uuid())
+  userId String
+  code String
+  expiresAt DateTime 
+  createdAt DateTime @default(now())
+}
+
+
+model OneTimePassword {
+  id String @id @default(uuid())
+  userId String
+  password Int
+  expiresAt DateTime 
+  createdAt DateTime @default(now())
+}
