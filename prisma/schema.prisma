@@ -62,6 +62,10 @@ model Users {
   profile Profiles[]
   reports Reports[]
   tests Tests[]
+  likes Likes[]
+  comments Comments[]
+  commentLikes CommentLikes[]
+  commentDislikes CommentDislikes[]
 }
 
  
@@ -163,7 +167,48 @@ model HealthTips {
   description String
   targetDemography String
   createdAt DateTime @default(now())
+  likes Likes[]
+  comments Comments[]
   doctor Doctors @relation(fields: [doctorId], references: [id])
+}
+
+
+model Likes {
+  id String @id @default(uuid())
+  tipId String
+  userId String
+  healthTip HealthTips @relation(fields: [tipId], references: [id])
+  user Users @relation(fields: [userId], references: [id])
+}
+
+
+model Comments {
+  id String @id @default(uuid())
+  tipId String
+  userId String
+  text String
+  user Users @relation(fields: [userId], references: [id])
+  healthTip HealthTips @relation(fields: [tipId], references: [id])
+  commentLikes CommentLikes[]
+  commentDislikes CommentDislikes[] 
+}
+
+
+model CommentLikes {
+  id String @id @default(uuid())
+   commentId String
+   userId String
+   comment Comments @relation(fields: [commentId], references: [id])
+   user Users @relation(fields: [userId], references: [id])
+}
+
+
+model CommentDislikes {
+  id String @id @default(uuid())
+   commentId String
+   userId String
+   comment Comments @relation(fields: [commentId], references: [id])
+   user Users @relation(fields: [userId], references: [id])
 }
 
 

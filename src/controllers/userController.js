@@ -127,9 +127,9 @@ export const getUser = async (req, res) => {
       },
     });
 
-    await prisma.oneTimeCode.delete({
+    await prisma.oneTimeCode.deleteMany({
       where: {
-        id: otc.id,
+        userId: otc.userId,
       },
     });
 
